@@ -6,7 +6,7 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-from scrapy.item import Item, BaseItem, Field
+from scrapy.item import Item, Field
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import Join, MapCompose, TakeFirst
 from w3lib.html import remove_tags, replace_escape_chars
