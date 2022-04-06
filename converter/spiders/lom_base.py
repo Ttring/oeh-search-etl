@@ -45,11 +45,11 @@ class LomBase(MethodPerformanceTracing):
 
     # override to improve performance and automatically handling id
     def getId(self, response=None) -> str:
-        raise NotImplemented()
+        return None
 
     # override to improve performance and automatically handling hash
     def getHash(self, response=None) -> str:
-        raise NotImplemented()
+        return None
 
     # return the unique uri for the entry
     def getUri(self, response=None) -> str:
