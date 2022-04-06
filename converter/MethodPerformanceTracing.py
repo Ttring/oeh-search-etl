@@ -1,11 +1,20 @@
 import logging
 import time
 
-class MethodPerformanceTracing():
+
+class MethodPerformanceTracing:
     methodRuntimeWarning = 5
     methodRuntimeInfo = 2
+
     # intercept method and check if runtime is taking too long
+
+    # this method is causing an error in twisted:
+    # isinstance(method_perf_tracing_obj, twisted.internet.defer.Deferred)
+    # -> TypeError: issubclass() arg 1 must be a class
+    """
     def __getattribute__(self, name):
+        
+        
         attr = object.__getattribute__(self, name)
         if hasattr(attr, '__call__'):
             def newfunc(*args, **kwargs):
@@ -22,3 +31,4 @@ class MethodPerformanceTracing():
             return newfunc
         else:
             return attr
+    """
