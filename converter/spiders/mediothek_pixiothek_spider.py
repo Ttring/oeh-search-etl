@@ -1,7 +1,7 @@
 import copy
 import json
-import os
 
+import scrapy
 from scrapy.spiders import CrawlSpider
 
 from converter.es_connector import EduSharing

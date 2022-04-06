@@ -1,10 +1,12 @@
-from converter.items import *
-import time
-from w3lib.html import remove_tags, replace_escape_chars
-from converter.spiders.lom_base import LomBase
-from converter.valuespace_helper import Valuespaces
-import requests
+
 from html.parser import HTMLParser
+
+import requests
+import scrapy
+
+from converter.items import *
+from converter.spiders.lom_base import LomBase
+from valuespace_converter.app.valuespaces import Valuespaces
 from converter.constants import Constants
 
 # LEIFIphysik spider for xml data file

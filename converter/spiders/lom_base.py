@@ -1,16 +1,16 @@
-import json
 
-from converter.MethodPerformanceTracing import MethodPerformanceTracing
-from converter.items import *
-from pprint import pprint
+import json
+import time
 import logging
-from converter.constants import Constants
+
+from scrapy.utils.project import get_project_settings
 import requests
 import html2text
-import urllib
-from scrapy.utils.project import get_project_settings
+from converter.MethodPerformanceTracing import MethodPerformanceTracing
+from converter.items import *
+from converter.constants import Constants
 from converter.es_connector import EduSharing
-import time
+
 
 class LomBase(MethodPerformanceTracing):
     friendlyName = "LOM Based spider"
@@ -23,7 +23,7 @@ class LomBase(MethodPerformanceTracing):
     remoteId = None
     forceUpdate = False
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         if "uuid" in kwargs:
             self.uuid = kwargs["uuid"]
         if "remoteId" in kwargs:
@@ -45,11 +45,11 @@ class LomBase(MethodPerformanceTracing):
 
     # override to improve performance and automatically handling id
     def getId(self, response=None) -> str:
-        return None
+        raise NotImplemented()
 
     # override to improve performance and automatically handling hash
     def getHash(self, response=None) -> str:
-        return None
+        raise NotImplemented()
 
     # return the unique uri for the entry
     def getUri(self, response=None) -> str:

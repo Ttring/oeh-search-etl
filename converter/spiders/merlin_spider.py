@@ -1,5 +1,7 @@
+
 import xmltodict as xmltodict
 from lxml import etree
+import scrapy
 from scrapy.spiders import CrawlSpider
 
 from converter.constants import Constants

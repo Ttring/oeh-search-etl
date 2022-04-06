@@ -1,17 +1,12 @@
-from scrapy.spiders import CrawlSpider
-from converter.items import *
-import time
-from w3lib.html import remove_tags, replace_escape_chars
+
+import json
+
+import scrapy
+from scrapy.selector import Selector
+
 from converter.spiders.lom_base import LomBase
 from converter.spiders.json_base import JSONBase
-import json
-import logging
-from html.parser import HTMLParser
-from converter.pipelines import ProcessValuespacePipeline
-import re
-import sys
 from converter.constants import Constants
-from scrapy.selector import Selector
 
 # Spider to fetch API from Serlo
 class TutorySpider(scrapy.Spider, LomBase, JSONBase):

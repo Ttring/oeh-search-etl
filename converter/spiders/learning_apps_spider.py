@@ -1,15 +1,11 @@
+
+from html.parser import HTMLParser
 from overrides import overrides
-from scrapy.http import Response
 
 from converter import items
-from converter.items import *
-import time
-from w3lib.html import remove_tags, replace_escape_chars
 from converter.spiders.lom_base import LomBase
-from converter.valuespace_helper import Valuespaces
-import requests
-from html.parser import HTMLParser
-from converter.constants import Constants
+import scrapy
+from scrapy.http import Response
 
 
 class LearningAppsSpider(scrapy.Spider, LomBase):

@@ -1,16 +1,13 @@
-from scrapy.spiders import CrawlSpider
-from converter.items import *
-import time
-from w3lib.html import remove_tags, replace_escape_chars
+
+import logging
+import json
+from html.parser import HTMLParser
+
+import requests
+import scrapy
+
 from converter.spiders.lom_base import LomBase
 from converter.spiders.json_base import JSONBase
-import json
-import logging
-import requests
-from html.parser import HTMLParser
-from converter.pipelines import ProcessValuespacePipeline
-import re
-from converter.valuespace_helper import ValuespaceHelper
 from converter.constants import *
 
 # Spider to fetch RSS from planet schule

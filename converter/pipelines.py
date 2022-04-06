@@ -4,34 +4,26 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-import csv
 
-from scrapy.exceptions import DropItem
-
-from converter import env
-from converter.constants import *
-import json
-import re
-from w3lib.html import replace_escape_chars
-from scrapy.exporters import JsonItemExporter
 import io
-from datetime import date
 import time
 import dateutil.parser
 import logging
-from pprint import pprint
-from PIL import Image
-from io import BytesIO
-import requests
-import urllib
 import base64
-import html2text
-import scrapy
-import sys
-import uuid
-from valuespace_converter.app.valuespaces import Valuespaces
+import csv
+from io import BytesIO
+
+from PIL import Image
+import requests
+from scrapy.exporters import JsonItemExporter
+from scrapy.exceptions import DropItem
 from scrapy.utils.project import get_project_settings
+
+from valuespace_converter.app.valuespaces import Valuespaces
+from converter import env
+from converter.constants import *
 from converter.es_connector import EduSharing
+
 
 # fillup missing props by "guessing" or loading them if possible
 class LOMFillupPipeline:
@@ -82,8 +74,8 @@ class NormLicensePipeline:
                     item["license"]["url"] = Constants.LICENSE_MAPPINGS[key]
                     break
         if "internal" in item["license"] and (
-            not "url" in item["license"]
-            or not item["license"]["url"] in Constants.VALID_LICENSE_URLS
+                not "url" in item["license"]
+                or not item["license"]["url"] in Constants.VALID_LICENSE_URLS
         ):
             for key in Constants.LICENSE_MAPPINGS_INTERNAL:
                 if item["license"]["internal"].casefold() == key.casefold():
@@ -93,10 +85,10 @@ class NormLicensePipeline:
 
         if "url" in item["license"] and not "oer" in item["license"]:
             if (
-                item["license"]["url"] == Constants.LICENSE_CC_BY_40
-                or item["license"]["url"] == Constants.LICENSE_CC_BY_SA_30
-                or item["license"]["url"] == Constants.LICENSE_CC_BY_SA_40
-                or item["license"]["url"] == Constants.LICENSE_CC_ZERO_10
+                    item["license"]["url"] == Constants.LICENSE_CC_BY_40
+                    or item["license"]["url"] == Constants.LICENSE_CC_BY_SA_30
+                    or item["license"]["url"] == Constants.LICENSE_CC_BY_SA_40
+                    or item["license"]["url"] == Constants.LICENSE_CC_ZERO_10
             ):
                 item["license"]["oer"] = OerType.ALL
 
@@ -119,7 +111,7 @@ class ConvertTimePipeline:
                     date = dateutil.parser.parse(item["lastModified"])
                     item["lastModified"] = int(date.timestamp())
                 except:
-                    logging.warn(
+                    logging.warning(
                         "Unable to parse given lastModified date "
                         + item["lastModified"]
                     )
@@ -131,9 +123,9 @@ class ConvertTimePipeline:
             splitted = time.split(":")
             if len(splitted) == 3:
                 mapped = (
-                    int(splitted[0]) * 60 * 60
-                    + int(splitted[1]) * 60
-                    + int(splitted[2])
+                        int(splitted[0]) * 60 * 60
+                        + int(splitted[1]) * 60
+                        + int(splitted[2])
                 )
             if mapped == None:
                 logging.warn(
@@ -211,9 +203,9 @@ class ProcessThumbnailPipeline:
             url = item['defaultThumbnail']
             response = requests.get(url)
         elif (
-            "location" in item["lom"]["technical"]
-            and "format" in item["lom"]["technical"]
-            and item["lom"]["technical"]["format"] == "text/html"
+                "location" in item["lom"]["technical"]
+                and "format" in item["lom"]["technical"]
+                and item["lom"]["technical"]["format"] == "text/html"
         ):
             if settings.get("SPLASH_URL"):
                 response = requests.post(
@@ -275,18 +267,14 @@ class ProcessThumbnailPipeline:
                     ).decode()
             except Exception as e:
                 if url is not None:
-                    logging.warn(
-                        "Could not read thumbnail at "
-                        + url
-                        + ": "
-                        + str(e)
-                    )
+                    logging.warning(f"Could not read thumbnail at {url}: {e}")
                 if "thumbnail" in item:
-                    logging.warn("(falling back to " + ("defaultThumbnail" if "defaultThumbnail" in item else "screenshot") + ")")
+                    logging.warning("(falling back to " + (
+                        "defaultThumbnail" if "defaultThumbnail" in item else "screenshot") + ")")
                     del item["thumbnail"]
                     return self.process_item(item, spider)
                 elif 'defaultThumbnail' in item:
-                    logging.warn("(falling back to screenshot)")
+                    logging.warning("(falling back to screenshot)")
                     del item['defaultThumbnail']
                     return self.process_item(item, spider)
                 else:
@@ -353,13 +341,14 @@ class JSONStorePipeline(object):
         return item
 
 
-class CSVStorePipeline():
+class CSVStorePipeline:
     rows = []
+
     def open_spider(self, spider):
-        self.csvFile = open('output_'+spider.name+'.csv', 'w', newline='')
+        self.csvFile = open('output_' + spider.name + '.csv', 'w', newline='')
         self.spamwriter = csv.writer(self.csvFile, delimiter=',',
-                                quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        self.rows = env.get("CSV_ROWS", allow_null = False).split(",")
+                                     quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        self.rows = env.get("CSV_ROWS", allow_null=False).split(",")
         print(self.rows)
         self.spamwriter.writerow(self.rows)
 
@@ -377,10 +366,12 @@ class CSVStorePipeline():
 
     def close_spider(self, spider):
         self.csvFile.close()
+
     def process_item(self, item, spider):
-        self.spamwriter.writerow(list(map(lambda x:self.getValue(item, x), self.rows)))
+        self.spamwriter.writerow(list(map(lambda x: self.getValue(item, x), self.rows)))
         self.csvFile.flush()
         return item
+
 
 class EduSharingStorePipeline(EduSharing):
     def process_item(self, item, spider):

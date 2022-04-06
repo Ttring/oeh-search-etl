@@ -1,7 +1,9 @@
+
+import vobject
+import scrapy
+
 from converter.items import *
 from converter.spiders.lom_base import LomBase
-import logging
-import vobject
 
 
 class OAIBase(scrapy.Spider, LomBase):

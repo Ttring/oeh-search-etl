@@ -77,17 +77,15 @@ class ESApiClient(ApiClient, MethodPerformanceTracing):
             def newfunc(*args, **kwargs):
                 if time.time() - ESApiClient.lastRequestTime > ESApiClient.COOKIE_REBUILD_THRESHOLD:
                     EduSharing.initCookie()
-                    self.cookie =  EduSharing.cookie
+                    self.cookie = EduSharing.cookie
 
                 # store last request time
                 ESApiClient.lastRequestTime = time.time()
                 return attr(*args, **kwargs)
 
-
             return newfunc
         else:
             return attr
-
 
 
 class EduSharing:

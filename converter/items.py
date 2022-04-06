@@ -5,12 +5,10 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
-import scrapy
+from itemloaders.processors import TakeFirst
 from scrapy.item import Item, Field
 from scrapy.loader import ItemLoader
-from scrapy.loader.processors import Join, MapCompose, TakeFirst
 from w3lib.html import remove_tags, replace_escape_chars
-import logging
 
 
 def replace_processor(value):
