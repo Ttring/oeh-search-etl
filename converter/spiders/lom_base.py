@@ -2,6 +2,7 @@
 import json
 import time
 import logging
+from typing import Optional
 
 from scrapy.utils.project import get_project_settings
 import requests
@@ -13,6 +14,7 @@ from converter.es_connector import EduSharing
 
 
 class LomBase(MethodPerformanceTracing):
+    name = 'unnamed_spider'
     friendlyName = "LOM Based spider"
     ranking = 1
     version = (
@@ -24,31 +26,29 @@ class LomBase(MethodPerformanceTracing):
     forceUpdate = False
 
     def __init__(self, *args, **kwargs):
+        if self.name == LomBase.name:
+            raise NotImplementedError(f'{self.__class__} does not provide a name')
+
         if "uuid" in kwargs:
             self.uuid = kwargs["uuid"]
         if "remoteId" in kwargs:
             self.remoteId = kwargs["remoteId"]
         if "cleanrun" in kwargs and kwargs["cleanrun"] == "true":
-            logging.info(
-                "cleanrun requested, will force update for crawler " + self.name
-            )
+            logging.info(f"cleanrun requested, will force update for crawler {self.name}")
             # EduSharing().deleteAll(self)
             self.forceUpdate = True
         if "resetVersion" in kwargs and kwargs["resetVersion"] == "true":
-            logging.info(
-                "resetVersion requested, will force update + reset versions for crawler "
-                + self.name
-            )
+            logging.info(f"resetVersion requested, will force update + reset versions for crawler {self.name}")
             # EduSharing().deleteAll(self)
             EduSharing.resetVersion = True
             self.forceUpdate = True
 
     # override to improve performance and automatically handling id
-    def getId(self, response=None) -> str:
+    def getId(self, response=None) -> Optional[str]:
         return None
 
     # override to improve performance and automatically handling hash
-    def getHash(self, response=None) -> str:
+    def getHash(self, response=None) -> Optional[str]:
         return None
 
     # return the unique uri for the entry
