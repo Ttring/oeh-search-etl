@@ -18,6 +18,7 @@ class SampleSpider(CrawlSpider, LomBase):
     version = "0.1"  # the version of your crawler, used to identify if a reimport is necessary
 
     def __init__(self, *args, **kwargs):
+        CrawlSpider.__init__(self, *args, **kwargs)
         LomBase.__init__(self, *args, **kwargs)
 
     def parse(self, response, **kwargs):
