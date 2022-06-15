@@ -117,6 +117,8 @@ ITEM_PIPELINES = {
         if storeMode == 'csv'
         else "converter.pipelines.JSONStorePipeline"
         if storeMode == 'json'
+        else "converter.pipelines.MongoDBPipeline"
+        if storeMode == 'MongoDB'
         else "converter.pipelines.EduSharingStorePipeline"
     ): 1000,
 }
@@ -165,3 +167,6 @@ FEED_EXPORT_FIELDS = [
 ]
 FEED_EXPORT_INDENT = 2
 FEED_EXPORT_ENCODING = "utf-8"
+
+MONGO_URI = "localhost:27017"
+MONGO_DATABASE = "admin"

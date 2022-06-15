@@ -1,0 +1,461 @@
+[
+{
+  "sourceId": "62960ebaa70b3d458b6d3ce1",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Blitze mit dem Bandgenerator - einfaches Modell für Gewitter",
+      "language": "de",
+      "description": "Mit Hilfe eines Bandgenerators und einer geerdeten Metallkugel können kleine, gut sichtbare und hörbare Blitze erzeugt werden. Dabei kann der Aufbau als einfache Analogie zum Verständnis von Blitzen bei Gewittern genutzt werden.",
+      "keyword": [
+        "Abstoßung",
+        "Bandgenerator",
+        "Blitze",
+        "Elektrizitätslehre",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035116.mp4",
+      "size": 19265412
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+},
+{
+  "sourceId": "6296107aa70b3d458b6d3d0b",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Zentripetalkraft bei Kugeln in rotierender Rinne",
+      "language": "de",
+      "description": "Das Video zeigt, dass zwei Kugeln in einer halbkreisförmigen Rinne, die mit fester Winkelgeschwindigkeit rotiert, immer in die gleiche Höhe steigen, egal ob die Kugeln gleich oder unterschiedlich schwer sind. Erklären lässt sich dies mithilfe der für eine Kreisbewegung notwendigen Zentripetalkraft.",
+      "keyword": [
+        "Kreisbewegung",
+        "Mechanik",
+        "Rotation",
+        "Winkelgeschwindigkeit",
+        "Zentripetalkraft",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035158.mp4",
+      "size": 43894397
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+},
+{
+  "sourceId": "6296107aa70b3d458b6d3d0a",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Zentraler, vollkommen unelastischer Stoß - einfache Fälle mit Formel und Erklärung",
+      "language": "de",
+      "description": "Bei einem zentralen unelastischen Stoß ist der Impuls erhalten, aber es geht Energie durch Verformung verloren. Beim vollkommen unelastischen Stoß bewegen sich beide Gleiter nach dem Stoß gemeinsam weiter. Du kannst daher berechnen, wie schnell sich zwei Stoßpartner nach einem Stoß weiterbewegen und wie viel Energie verloren ging. Im Video werden die entsprechenden Formeln für die verschiedenen Fälle erläutert  und mit Experimenten auf der Luftkissenbahn verständlich erklärt.",
+      "keyword": [
+        "Mechanik",
+        "Stoß",
+        "unelastischer Stoß",
+        "zentraler Stoß",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035157.mp4",
+      "size": 32777908
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+},
+{
+  "sourceId": "6296107aa70b3d458b6d3d09",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Zentraler elastischer Stoß - einfache Fälle mit Formel und Erklärung",
+      "language": "de",
+      "description": "Bei einem zentralen elastischen Stoß sind Energie und Impuls erhalten. Daher kann man berechnen, wie schnell sich zwei Stoßpartner nach einem Stoß bewegen. Im Video werden die entsprechenden Formeln für die verschiedenen Fälle erläutert  und mit Experimenten auf der Luftkissenbahn verständlich erklärt.",
+      "keyword": [
+        "Energie",
+        "Impuls",
+        "Luftkissenbahn",
+        "elastischer Stoß",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035156.mp4",
+      "size": 37260059
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+},
+{
+  "sourceId": "62961079a70b3d458b6d3d05",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Wärmewirkung + Leuchtwirkung von elektrischem Strom - Durchbrennen und Schmelzen eines Eisendrahts",
+      "language": "de",
+      "description": "Das Video verdeutlicht die Wärme- und die Leuchtwirkung von elektrischem Strom, die beide oft gemeinsam Auftreten. Im Versuch fließt ein so großer Strom durch einen Eisendraht, dass dieser durchbrennt. Im zweiten Teil wird  das Eisen sogar zum Schmelzen gebracht, der Draht wird also durch den Strom auf über 1500 °C erhitzt.",
+      "keyword": [
+        "Elektrizitätslehre",
+        "Leuchtwirkung",
+        "Strom",
+        "Stromwirkungen",
+        "Wärmewirkung",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035152.mp4",
+      "size": 18382423
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+},
+{
+  "sourceId": "62961078a70b3d458b6d3d04",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Wärmetransport durch Konvektion (Teilchentransport)",
+      "language": "de",
+      "description": "Demonstrationsversuch zum Wärmetransport durch Konvektion (Teilchentransport) in Analogie zu einem Heizungskreislauf ohne Pumpe. Das Erwärmen des Wassers an einer Stelle im System sorgt dafür, dass sich ein Wasserkreislauf bildet. Das erwärmte Wasser strömt durch das U-Rohr.",
+      "keyword": [
+        "Konvektion",
+        "Teilchentransport",
+        "Wärmetransport",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035151.mp4",
+      "size": 24287359
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+},
+{
+  "sourceId": "62961079a70b3d458b6d3d08",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Wiegen im Vakuum, Auftrieb von Luft und das Archimedische Prinzip",
+      "language": "de",
+      "description": "Der Versuch zeigt, dass das Archimedische Prinzip nicht nur für Körper in Flüssigkeiten, sondern auch für Körper in Luft gilt. Wiegen im Vakuum liefert ein anderes Ergebnis als das Wiegen im \"Luftmeer\" und ein Heißluftballon schwebt im Meer aus Luft.",
+      "keyword": [
+        "Archimedisches Prinzip",
+        "Auftrieb",
+        "Luft",
+        "Vakuum",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035155.mp4",
+      "size": 26559786
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+},
+{
+  "sourceId": "62961079a70b3d458b6d3d07",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Weißsche Bezirke in ferromagnetischen Stoffen - einfacher Modellversuch zur Magnetisierung von Eisen",
+      "language": "de",
+      "description": "Das Video veranschaulicht in einem Modellversuch die sog. Weißschen Bezirke (Weiss-Bezirke) in ferromagnetischen Stoffen und zeigt, wie diese Bezirke in einem stärker werdenden äußeren Magnetfeld nach und nach umklappen. Damit kann die Magnetisierbarkeit von ferromagnetischen Stoffen wie Eisen erklärt werden. Eine Restmagnetisierung (Remanenz) verbleibt auch, wenn das äußere Magnetfeld abgeschaltet wird. Erst Schütteln (Erwärmen) bzw. Klopfen (mechanische Erschütterungen) sorgt wieder dafür, dass die Weißschen Bezirke sich zufällig ausrichten und der Stoff nach außen entmagnetisiert ist.",
+      "keyword": [
+        "Eisen",
+        "Ferromagnetismus",
+        "Magnetisierung",
+        "Weißsche Bezirke",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035154.mp4",
+      "size": 28291041
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+},
+{
+  "sourceId": "62961079a70b3d458b6d3d06",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Warum ist die Erde keine Kugel sondern abgeplattet?",
+      "language": "de",
+      "description": "Das Video zeigt, wie bei einem kugelförmigen Körper durch Rotation eine Abplattung an den Polen und eine Wulst am Äquator entsteht. Weiter wird die Ursache hierfür, nämlich die bei Rotation nötige Zentripetalkraft erläutert.",
+      "keyword": [
+        "Abplattung",
+        "Rotation",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035153.mp4",
+      "size": 17168332
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+},
+{
+  "sourceId": "62961078a70b3d458b6d3d03",
+  "lom": {
+    "general": {
+      "aggregationLevel": "1",
+      "title": "Wann leitet Wasser elektrischen Strom?",
+      "language": "de",
+      "description": "Zwei einfache Experimente zeigen, dass destilliertes, also salzfreies Wasser keinen elektrischen Strom leitet. Schon eine minimale Menge im Wasser gelöstes Salz führt jedoch dazu, dass dieses \"Salzwasser\" Strom leitet. Weiter gilt je mehr Salz im Wasser ist, desto besser leitet das Salzwasser.",
+      "keyword": [
+        "Salzwasser",
+        "Strom leiten",
+        "Wasser",
+        "elektrischer Strom",
+        "mebis Tube"
+      ]
+    },
+    "lifecycle": [
+      {
+        "role": "publisher",
+        "organization": "mebis Tube"
+      }
+    ],
+    "technical": {
+      "format": "video/mp4",
+      "location": "https://download.sodix.de/api/content/data/SODIX-0001035150.mp4",
+      "size": 51244667
+    },
+    "educational": {
+      "language": "de"
+    },
+    "classification": {},
+    "relation": [
+      {}
+    ],
+    "annotation": [
+      {
+        "entity": "crawler",
+        "description": "searchable==1"
+      }
+    ]
+  },
+  "license": {
+    "internal": "CUSTOM",
+    "description": "CC BY-SA; Vervielfältigung und Verbreitung erlaubt. Namensnennung erforderlich. Weitergabe unter gleichen Bedingungen."
+  }
+}
+]

@@ -1,34 +1,39 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import annotations
+
 import base64
+import codecs
 # Define your item pipelines here
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 import csv
-import dateparser
 import io
-import isodate
 import logging
+import sys
+import pymongo
 import time
-from io import BytesIO
-from typing import BinaryIO, TextIO, Optional
 from abc import ABCMeta
+from io import BytesIO
+from typing import BinaryIO, Optional, TextIO
+
+import dateparser
 import dateutil.parser
+import isodate
 import requests
-from PIL import Image
 import scrapy
 import scrapy.crawler
+from itemadapter import ItemAdapter
+from PIL import Image
 from scrapy.exceptions import DropItem
 from scrapy.exporters import JsonItemExporter
 from scrapy.utils.project import get_project_settings
-from itemadapter import ItemAdapter
+from valuespace_converter.app.valuespaces import Valuespaces
 
 from converter import env
 from converter.constants import *
 from converter.es_connector import EduSharing
-from valuespace_converter.app.valuespaces import Valuespaces
 
 log = logging.getLogger(__name__)
 
@@ -604,4 +609,53 @@ class DummyPipeline(BasicPipeline):
     def process_item(self, item, spider):
         log.info("DRY RUN scraped {}".format(item["response"]["url"]))
         # self.exporter.export_item(item)
+        return item
+
+class MongoDBPipeline(BasicPipeline, PipelineWithPerSpiderMethods): 
+
+    collection_name = 'sodix_spider'
+
+    def __init__(self, mongo_uri, mongo_db):
+        # for mongoDB
+        self.mongo_uri = mongo_uri
+        self.mongo_db  = mongo_db
+        if not self.mongo_uri : sys.exit("no Connection String")
+
+        # # to export data to mongoDB
+        # self.files: dict[str, TextIO] = {}
+        # self.exporters: dict[str, csv.writer] = {}
+        # CSVStorePipeline.rows = env.get("CSV_ROWS", allow_null=False).split(",")
+        
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongo_uri = crawler.settings.get('MONGO_URI'),
+            mongo_db = crawler.settings.get('MONGO_DATABASE')
+        )
+    
+    def open_spider(self, spider):
+        ## initializing spider
+        ## opening db connection
+        self.client = pymongo.MongoClient(self.mongo_uri)
+        self.db = self.client[self.mongo_db]
+
+    def close_spider(self, spider):
+        ## clean up when spider is closed
+        self.client.close()
+
+    def process_item(self, raw_item, spider):
+        item = ItemAdapter(raw_item)
+        print(item['response']["headers"])
+        print("**************************************************************")
+        byte = item['response']["headers"]
+        item['response']["headers"] = byte.to_unicode_dict()
+        
+                       
+            # print(key, value)
+        print(type(item['response']["headers"]))
+
+        print("#############################################################")
+
+        self.db[self.collection_name].insert_one(item.asdict())
+        logging.debug("Post added to MongoDB")
         return item

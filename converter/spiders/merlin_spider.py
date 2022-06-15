@@ -22,7 +22,7 @@ class MerlinSpider(CrawlSpider, LomBase):
     version = "0.2"  # the version of your crawler, used to identify if a reimport is necessary
     apiUrl = "https://merlin.nibis.de/index.php?action=resultXml&start=%start&anzahl=%anzahl&query[stichwort]=*"  # * regular expression, to represent all possible values.
 
-    limit = 100
+    limit = 0
     page = 0
 
     def __init__(self, **kwargs):

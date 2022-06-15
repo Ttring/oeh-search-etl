@@ -43,9 +43,10 @@ class MediothekPixiothekSpider(CrawlSpider, LomBase):
         prepared_elements = [self.prepare_element(element_dict) for element_dict in elements]
 
         collection_elements = self.prepare_collections(prepared_elements)
-
+        count = 0 
         for i, element_dict in enumerate(collection_elements):
-
+            if count == 10:
+                break
             copyResponse = response.copy()
 
             # Passing the dictionary for easier access to attributes.
@@ -60,6 +61,7 @@ class MediothekPixiothekSpider(CrawlSpider, LomBase):
 
             # LomBase.parse() has to be called for every individual instance that needs to be saved to the database.
             LomBase.parse(self, copyResponse)
+            count+= 1
 
 
     def getId(self, response):

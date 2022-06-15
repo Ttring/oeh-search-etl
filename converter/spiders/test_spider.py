@@ -10,10 +10,9 @@ from converter.spiders.base_classes.lom_base import LomBase
 from scrapy.spiders import CrawlSpider
 from scrapy.spidermiddlewares.httperror import HttpError
 
-
 query_string = '''
 {
-    findAllMetadata(page: 0, pageSize: 1) {
+    findAllMetadata(page: 0, pageSize: 10) {
         id
         description
         keywords
@@ -39,9 +38,7 @@ query_string = '''
     }
 }
 '''
-
-
-class SodixSpider(CrawlSpider, LomBase):
+class TestSpider(CrawlSpider, LomBase):
     """
     This crawler fetches data from the SODIX. The Scrapy request with GraphQL in JSON (please refer to body in parse() function).
     The Response will be convert to python dictionary using json.dumps(). Response.meta['item'] is used in every
@@ -53,9 +50,9 @@ class SodixSpider(CrawlSpider, LomBase):
     Author: BRB team
     """
 
-    name = 'sodix_spider'
+    name = 'test_spider'
     url = 'https://www.sodix.de/'
-    friendlyName = 'Sodix'
+    friendlyName = 'Test'
     version = '0.1'
     urlLogin = 'https://api.sodix.de/gql/auth/login'
     urlRequest = 'https://api.sodix.de/gql/graphql'
