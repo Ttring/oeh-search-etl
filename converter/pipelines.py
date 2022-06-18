@@ -612,19 +612,16 @@ class DummyPipeline(BasicPipeline):
         return item
 
 class MongoDBPipeline(BasicPipeline, PipelineWithPerSpiderMethods): 
-
-    collection_name = 'sodix_spider'
-
+    '''
+    database name : admin 
+    database uri : localhost:12017 
+    Both are defined in settings
+    '''
     def __init__(self, mongo_uri, mongo_db):
-        # for mongoDB
+        # for mongoDB       
         self.mongo_uri = mongo_uri
         self.mongo_db  = mongo_db
-        if not self.mongo_uri : sys.exit("no Connection String")
-
-        # # to export data to mongoDB
-        # self.files: dict[str, TextIO] = {}
-        # self.exporters: dict[str, csv.writer] = {}
-        # CSVStorePipeline.rows = env.get("CSV_ROWS", allow_null=False).split(",")
+        if not self.mongo_uri : sys.exit("URI to mongoDB is wrong")
         
     @classmethod
     def from_crawler(cls, crawler):
@@ -633,29 +630,33 @@ class MongoDBPipeline(BasicPipeline, PipelineWithPerSpiderMethods):
             mongo_db = crawler.settings.get('MONGO_DATABASE')
         )
     
-    def open_spider(self, spider):
-        ## initializing spider
-        ## opening db connection
+    def open_spider(self, spider):       
+        # access database on MongoDB
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
 
     def close_spider(self, spider):
-        ## clean up when spider is closed
         self.client.close()
 
     def process_item(self, raw_item, spider):
+        # convert "headers" from byte to dict, because MongoDB doesn't accept byte
         item = ItemAdapter(raw_item)
-        print(item['response']["headers"])
-        print("**************************************************************")
         byte = item['response']["headers"]
         item['response']["headers"] = byte.to_unicode_dict()
-        
-                       
-            # print(key, value)
-        print(type(item['response']["headers"]))
 
-        print("#############################################################")
+        # delete collection in database if the spider has been crawled before, to avoid duplicate for spider crawler
+        collection_exists = spider.name in self.db.list_collection_names()
+        if collection_exists == True:
+            logging.debug("collection exists")
+            collection = self.db[spider.name]
+            collection.drop()
+            # create database again with spider name.
+            self.collection_name = spider.name
+        else :
+        # create new collection if spider has never been crawled before. 
+            logging.debug("collection doesn't exists")
+            self.collection_name = spider.name
 
         self.db[self.collection_name].insert_one(item.asdict())
-        logging.debug("Post added to MongoDB")
+        logging.debug("{} is added to MongoDB as collection".format(self.collection_name))
         return item
