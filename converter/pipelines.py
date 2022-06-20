@@ -635,15 +635,6 @@ class MongoDBPipeline(BasicPipeline, PipelineWithPerSpiderMethods):
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
 
-    def close_spider(self, spider):
-        self.client.close()
-
-    def process_item(self, raw_item, spider):
-        # convert "headers" from byte to dict, because MongoDB doesn't accept byte
-        item = ItemAdapter(raw_item)
-        byte = item['response']["headers"]
-        item['response']["headers"] = byte.to_unicode_dict()
-
         # delete collection in database if the spider has been crawled before, to avoid duplicate for spider crawler
         collection_exists = spider.name in self.db.list_collection_names()
         if collection_exists == True:
@@ -656,6 +647,17 @@ class MongoDBPipeline(BasicPipeline, PipelineWithPerSpiderMethods):
         # create new collection if spider has never been crawled before. 
             logging.debug("collection doesn't exists")
             self.collection_name = spider.name
+
+    def close_spider(self, spider):
+        self.client.close()
+
+    def process_item(self, raw_item, spider):
+        # convert "headers" from byte to dict, because MongoDB doesn't accept byte
+        item = ItemAdapter(raw_item)
+        byte = item['response']["headers"]
+        item['response']["headers"] = byte.to_unicode_dict()
+
+
 
         self.db[self.collection_name].insert_one(item.asdict())
         logging.debug("{} is added to MongoDB as collection".format(self.collection_name))
