@@ -657,8 +657,6 @@ class MongoDBPipeline(BasicPipeline, PipelineWithPerSpiderMethods):
         byte = item['response']["headers"]
         item['response']["headers"] = byte.to_unicode_dict()
 
-
-
         self.db[self.collection_name].insert_one(item.asdict())
         logging.debug("{} is added to MongoDB as collection".format(self.collection_name))
         return item
