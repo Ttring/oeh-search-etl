@@ -12,7 +12,7 @@ from scrapy.spidermiddlewares.httperror import HttpError
 
 query_string = '''
 {
-    findAllMetadata(page: 0, pageSize: 10) {
+    findAllMetadata(page: 0, pageSize: 1) {
         id
         description
         keywords

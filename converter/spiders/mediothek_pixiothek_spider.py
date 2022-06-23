@@ -45,7 +45,7 @@ class MediothekPixiothekSpider(CrawlSpider, LomBase):
         collection_elements = self.prepare_collections(prepared_elements)
         count = 0 
         for i, element_dict in enumerate(collection_elements):
-            if count == 10:
+            if count == 1:
                 break
             copyResponse = response.copy()
 

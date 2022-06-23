@@ -10,15 +10,19 @@ class find_duplicate:
         self.mongo_db = settings.MONGO_DATABASE
 
     def get_metadata(self):
+        # access database on MongoDB
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
 
-        self.collection = self.db.list_collection_names()
-        for i in range (len(self.collection)):
-            print("Collection name: " +self.collection[i])
-            collection = self.db[self.collection[i]]
-            for data in collection.find():
-                pprint(data) 
+        # Filter off collection name "system.version" and save the rest as self.collection
+        self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne': 'system.version'}})
+        
+        for collection in self.collection:
+            for data in self.db[collection].find():
+                if data == "system.version":
+                   continue
+                print("Collection name: " +collection)    
+                pprint(data)
 
 a = find_duplicate()
 a.get_metadata()
