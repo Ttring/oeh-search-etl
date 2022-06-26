@@ -15,28 +15,30 @@ from converter import settings
 class find_duplicate: 
 
     def __init__(self):
-        #self.enabled = env.get("MODE", default="edu-sharing") == "edu-sharing"
+        # self.enabled = env.get("MODE", default="edu-sharing") == "edu-sharing"
         self.mongo_uri = settings.MONGO_URI
         self.mongo_db = settings.MONGO_DATABASE
 
-    def create_key(self):
         # access database on MongoDB
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
 
-        # Filter off collection name "system.version" and save the rest as self.collection
+    def create_sort_key(self):
+        # filter off collection name "system.version" and save the rest as self.collection
         self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne': 'system.version'}})
         
-        # print out all documents in every collection 
+        # list every collection 
         for collection in self.collection:
-            for data in self.db[collection].find():
-                if data == "system.version":
-                   continue
-                print("Collection name: " +collection)    
-                #pprint(data)
-                key = self.hashing(data['lom']['general']['title']) + self.get_non_vowels(data['lom']['technical']['format'])
-                print(key)
+            print("Collection name: " +collection)   
 
+            # list every document in collection
+            for document in self.db[collection].find():
+                #pprint(data)
+                # change title to small capital letters and combine it with it's format type
+                key = self.hashing(document['lom']['general']['title'].lower()) + self.get_non_vowels(document['lom']['technical']['format'])
+                # insert new field into document
+                self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
+        
     def hashing(self, title):
         # hash the string for comparison purposes
         encoded_str = title.encode()
@@ -51,7 +53,7 @@ class find_duplicate:
         non_vowels = ""
 
         for word in list:
-            # n act as a breakpoint. It stops after getting 3 non vowels.
+            # n acts as a breakpoint. It stops after getting 3 non vowels.
             n = 0
             for alphabet in word.lower():
                 if n == 3:
@@ -61,8 +63,8 @@ class find_duplicate:
                 else:
                     n += 1
             non_vowels += word[0:3]
-        return non_vowels
+        return non_vowels[0:4]
 
 
 a = find_duplicate()
-a.create_key()
+a.create_sort_key()
