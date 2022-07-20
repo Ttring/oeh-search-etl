@@ -33,46 +33,45 @@ class FindDuplicate:
 
     def create_sort_key(self):
         # filter off collection name "system.version" and save the rest as self.collection
-        self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne': 'system.version'}})
-
+        self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
         # list every collection 
-        for collection in self.collection:
-            print("Collection name: " +collection)   
-            #n = 0
-            # list every document in collection
-            for document in self.db[collection].find():
-                #pprint(data)
-                #if n == 1000: 
-                 #   break
-                try: 
-                    size = document['lom']['technical']['duration']
-                except KeyError:
-                    try:
-                        size = document['lom']['technical']['size']
+        for collection in self.collection: 
+            if (collection == "sodix_spider"  or  collection =="test_spider"):
+                print("Collection name: " +collection) 
+                n = 0   
+                # list every document in collection
+                for document in self.db[collection].find():
+                    #pprint(data)
+                    if n  == 5:
+                        continue
+                    try: 
+                        size = document['lom']['technical']['duration']
                     except KeyError:
-                        size = "00"
-                try :
-                    format = document['lom']['technical']['format']
-                except KeyError:
-                    format = ""
+                        try:
+                            size = document['lom']['technical']['size']
+                        except KeyError:
+                            size = "00"
+                    try :
+                        format = document['lom']['technical']['format']
+                    except KeyError:
+                        format = ""
 
-                # change title to small capital letters and combine it with it's format type
-                key = self.hashed_title(document['lom']['general']['title'].lower()) + self.non_vowels(format) + self.format_size(size)
+                    # change title to small capital letters and combine it with it's format type
+                    key = self.hashed_title(document['lom']['general']['title'].lower()) + self.non_vowels(format) + self.format_size(size)
 
-                # append key into key_list for merge sort
-                self.key_list_qh.append(key)
+                    # append key into key_list for merge sort
+                    self.key_list_qh.append(key)
 
-                # insert key and collection as field into document
-                self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
-                self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"spiderName": collection}})
-                #n += 1
+                    # insert key and collection as field into document
+                    self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
+                    self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"spiderName": collection}})
+                    n += 1
         self.sort_sort_key()
 
     def sort_sort_key(self):
-        print("inside sort key")
         copy_key_list = list(self.key_list_qh) # make a original copy of the list
         self.hybrid_quick_sort(self.key_list_qh, 0 ,len(self.key_list_qh)-1)  # sort the sort-key 
-        print("num\t\tkey_list_qh")
+        print("num\tkey_list_ori\tkey_list_qh")
         for i in range(len(self.key_list_qh)):
             print(str(i) + '\t' +  copy_key_list[i]+ '\t' + self.key_list_qh[i])
 
@@ -126,6 +125,7 @@ class FindDuplicate:
          
     def hybrid_quick_sort(self, arr, low, high):
         while low<high:
+            # when the list has less than 10 elements, then run insertionsort. the threshold is self-defined.
             if high-low + 1<10:
                 self.insertion_sort(arr, low, high)
                 break
@@ -137,6 +137,7 @@ class FindDuplicate:
                 else: # hybrid sort right side (between pivot and high)
                     self.hybrid_quick_sort(arr, pivot + 1, high)
                     high = pivot-1
+
 
 a = FindDuplicate()
 a.create_sort_key()
