@@ -77,8 +77,9 @@ class FindDuplicate:
 
     def hashed_title(self, title):
         # hash the title for comparison purposes
-        encoded_str = title.encode()
+        encoded_str = title.lower().encode()
         hash_obj_sha224 = hashlib.sha224(encoded_str)
+        print(title ,str("\t:") ,hash_obj_sha224.hexdigest())
         return hash_obj_sha224.hexdigest()[0:4]
     
     # convert MIME type to part of the key by getting it's non vowel alphabet such as application/pdf will be pplpdf
@@ -137,11 +138,8 @@ class FindDuplicate:
                 else: # hybrid sort right side (between pivot and high)
                     self.hybrid_quick_sort(arr, pivot + 1, high)
                     high = pivot-1
-
+    
 
 a = FindDuplicate()
-a.create_sort_key()
-
-# temp = [1,4,3,5,6,23,8,9,13,15,23,7,2]
-# a.hybrid_quick_sort(temp, 0 , len(temp)-1)
-# print(temp)
+a.hashed_title("Grundlagen der Informatik")
+a.hashed_title("GrundlagenderInformatik")
