@@ -14,7 +14,8 @@ from converter import settings
 1: obtain documents from database
 2: create key from metadata
 3: sort metadata according to key
-4: implement sorted block algorithms 
+4: create partition according to key
+5: implement sorted block algorithms 
 '''
 
 class FindDuplicate: 
@@ -38,12 +39,12 @@ class FindDuplicate:
         for collection in self.collection: 
             if (collection == "sodix_spider"  or  collection =="test_spider"):
                 print("Collection name: " +collection) 
-                n = 0   
+               # n = 0   
                 # list every document in collection
                 for document in self.db[collection].find():
                     #pprint(data)
-                    if n  == 5:
-                        continue
+                    #if n  == 10:
+                     #   continue
                     try: 
                         size = document['lom']['technical']['duration']
                     except KeyError:
@@ -65,21 +66,22 @@ class FindDuplicate:
                     # insert key and collection as field into document
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"spiderName": collection}})
-                    n += 1
-        self.sort_sort_key()
+                    #n += 1
+        self.sort_sortkey()
 
-    def sort_sort_key(self):
+    def sort_sortkey(self):
         copy_key_list = list(self.key_list_qh) # make a original copy of the list
         self.hybrid_quick_sort(self.key_list_qh, 0 ,len(self.key_list_qh)-1)  # sort the sort-key 
-        print("num\tkey_list_ori\tkey_list_qh")
-        for i in range(len(self.key_list_qh)):
-            print(str(i) + '\t' +  copy_key_list[i]+ '\t' + self.key_list_qh[i])
+        print("num\tvor Sortierung\tnach Sortierung")
+        for i, (a, b) in enumerate(zip(copy_key_list, self.key_list_qh)):
+            print(str(i) + '\t' +  a+ '\t' + b)
+        p=self.create_partition(self.key_list_qh)
+        print(list(p))
 
     def hashed_title(self, title):
         # hash the title for comparison purposes
         encoded_str = title.lower().encode()
         hash_obj_sha224 = hashlib.sha224(encoded_str)
-        print(title ,str("\t:") ,hash_obj_sha224.hexdigest())
         return hash_obj_sha224.hexdigest()[0:4]
     
     # convert MIME type to part of the key by getting it's non vowel alphabet such as application/pdf will be pplpdf
@@ -106,40 +108,43 @@ class FindDuplicate:
         return str(size)[0:2]
         
     # Hybrid Quick Sort 
-    def insertion_sort(self, arr, low, n):    
+    def insertion_sort(self, list, low, n):    
         for i in range(low + 1, n + 1):
-            pivot = arr[i]
-            while i>low and arr[i-1]>pivot:
-                arr[i]= arr[i-1]
+            pivot = list[i]
+            while i>low and list[i-1]>pivot:
+                list[i]= list[i-1]
                 i-= 1
-            arr[i]= pivot
+            list[i]= pivot
  
-    def partition(self, arr, low, high):
-        pivot = arr[high]
+    def partition(self, list, low, high):
+        pivot = list[high]
         i = j = low
         for i in range(low, high):
-            if arr[i]<pivot:
-                arr[i], arr[j]= arr[j], arr[i]
+            if list[i]<pivot:
+                list[i], list[j]= list[j], list[i]
                 j+= 1
-        arr[j], arr[high]= arr[high], arr[j]
+        list[j], list[high]= list[high], list[j]
         return j
          
-    def hybrid_quick_sort(self, arr, low, high):
+    def hybrid_quick_sort(self, list, low, high):
         while low<high:
             # when the list has less than 10 elements, then run insertionsort. the threshold is self-defined.
             if high-low + 1<10:
-                self.insertion_sort(arr, low, high)
+                self.insertion_sort(list, low, high)
                 break
             else:
-                pivot = self.partition(arr, low, high)
+                pivot = self.partition(list, low, high)
                 if pivot-low<high-pivot: # hybrid sort left side (between low and pivot)
-                    self.hybrid_quick_sort(arr, low, pivot-1)
+                    self.hybrid_quick_sort(list, low, pivot-1)
                     low = pivot + 1
                 else: # hybrid sort right side (between pivot and high)
-                    self.hybrid_quick_sort(arr, pivot + 1, high)
+                    self.hybrid_quick_sort(list, pivot + 1, high)
                     high = pivot-1
-    
 
+    def create_partition(self, list):
+        for i in range(0, len(list), 2):
+            yield list[i : i+2]
+
+#https://favtutor.com/blogs/partition-list-python
 a = FindDuplicate()
-a.hashed_title("Grundlagen der Informatik")
-a.hashed_title("GrundlagenderInformatik")
+a.create_sort_key()
