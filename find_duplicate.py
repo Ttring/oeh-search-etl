@@ -39,12 +39,12 @@ class FindDuplicate:
         for collection in self.collection: 
             if (collection == "sodix_spider"  or  collection =="test_spider"):
                 print("Collection name: " +collection) 
-               # n = 0   
+                n = 0   
                 # list every document in collection
                 for document in self.db[collection].find():
                     #pprint(data)
-                    #if n  == 10:
-                     #   continue
+                    if n  == 5:
+                        break
                     try: 
                         size = document['lom']['technical']['duration']
                     except KeyError:
@@ -66,7 +66,7 @@ class FindDuplicate:
                     # insert key and collection as field into document
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"spiderName": collection}})
-                    #n += 1
+                    n += 1
         self.sort_sortkey()
 
     def sort_sortkey(self):
@@ -75,8 +75,7 @@ class FindDuplicate:
         print("num\tvor Sortierung\tnach Sortierung")
         for i, (a, b) in enumerate(zip(copy_key_list, self.key_list_qh)):
             print(str(i) + '\t' +  a+ '\t' + b)
-        p=self.create_partition(self.key_list_qh)
-        print(list(p))
+        self.create_partition(self.key_list_qh)
 
     def hashed_title(self, title):
         # hash the title for comparison purposes
@@ -142,9 +141,17 @@ class FindDuplicate:
                     high = pivot-1
 
     def create_partition(self, list):
-        for i in range(0, len(list), 2):
-            yield list[i : i+2]
+        start_p = 0
+        for i, sortkey in enumerate (list[:-1]):
+            if sortkey == list[i+1]:
+                end_p = i + 1
+            else :
+                start_p = i + 1 
+                end_p = start_p
+            print("start: " +str(start_p) +"\tend :" +str(end_p)) if (end_p is not start_p) else ""
+        #for i in range(0, len(list), 2):
+         #   yield list[i : i+2]
 
-#https://favtutor.com/blogs/partition-list-python
+
 a = FindDuplicate()
 a.create_sort_key()
