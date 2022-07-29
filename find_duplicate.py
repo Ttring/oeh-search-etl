@@ -80,7 +80,7 @@ class FindDuplicate:
         p = list(self.create_partition(self.key_list_qh))
         print(list(self.create_partition(self.key_list_qh)))
         self.partition_size(p)
-        print(self.sorted_neighbourhood(self.key_list_qh,4))
+        print(self.sorted_blocks(self.key_list_qh,4))
 
     def hashed_title(self, title):
         # hash the title for comparison purposes
@@ -148,6 +148,7 @@ class FindDuplicate:
     def create_partition(self, list):
         start_p = 0
         end_p = 0
+        #sort based on first 3 characters of the sort key.
         for i in range(len(list[:-1])): 
             if(list[i][0:3] == list[i+1][0:3]) :
                 end_p = i + 1
@@ -167,36 +168,28 @@ class FindDuplicate:
             if(len(i)>self.max_partition_size):
                 self.max_partition_size = len(i)
 
-    def sorted_neighbourhood(self,sorted_list,o):
-        lcr = [] # list comparison records
-        window_num = o +1 # num of window in overlapping area
+    def sorted_blocks(self,sorted_list,o):
+        lcr = [] # list comparison records (elements in the window) 
+        window_num = o + 1 # num of window in overlapping area
         i = 0
 
         # iterate over all records to search for duplicates
         while i<len(sorted_list):
-            # record is the first element of new partition
-            #print("\nlcr:" , lcr)
-           # print("currently i :" +str(i) +" window_num :" , window_num)
+            
+            # if it is first element of the partition 
             if (i in self.first_par_element and i>0) or (len(lcr) == self.max_partition_size): 
                 # remove all records of the previous partition that is not in overlap
-                #print("element is the same as first element in partition")
                 while len(lcr) > o:
-                    #print("remove previous record in lcr")
-                    lcr.pop(0)
-                    #print("lcr:" , lcr)
+                    lcr.pop(0)   
                 window_num = 0
+            # if window is less than overlap size
             elif window_num <= o :
-                #print("if windown is less than 0")
                 lcr.pop(0)
                 #print("lcr:" , lcr)
                 window_num += 1
             
-            # compare current record with all records in lcr
-            for j in range(len(lcr)): # print j from 1 onwards
-                #print("i:" ,i)
-                #print("sorted_list :" ,sorted_list) 
-                #print("lcr :" , lcr)
-               
+            # compare current record with all records in lcr/window
+            for j in range(len(lcr)): 
                 if (sorted_list[i]== lcr[j]) and sorted_list.count(lcr[j])>1:
                     sorted_list.pop(i)
                     i-=1
@@ -210,5 +203,6 @@ class FindDuplicate:
             lcr.append(sorted_list[i])
             i += 1 
         return sorted_list
+
 a = FindDuplicate()
 a.create_sort_key()
