@@ -1,5 +1,6 @@
 import hashlib
 import random
+from re import A
 import time
 from pprint import pprint
 
@@ -30,22 +31,22 @@ class FindDuplicate:
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
 
-        # key_list for sorting
-        self.key_list_qh = [] # list for quick sort hybrid
-        self.first_par_element = [] #first element in partition
+        # array for sorting
+        self.key_arr_qh = np.array([]) # list of keys
+        self.first_par_element = np.array([]) # first partition element
 
     def create_sort_key(self):
         # filter off collection name "system.version" and save the rest as self.collection
         self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
-        # list every collection 
+        # arr every collection 
         for collection in self.collection: 
             if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):
                 print("Collection name: " +collection) 
                 n = 0   
-                # list every document in collection
+                # arr every document in collection
                 for document in self.db[collection].find():
                     #pprint(data)
-                    if n  == 20:
+                    if n  == 5:
                         break
                     try: 
                         size = document['lom']['technical']['duration']
@@ -62,25 +63,21 @@ class FindDuplicate:
                     # change title to small capital letters and combine it with it's format type
                     key = self.hashed_title(document['lom']['general']['title'].lower()) + self.non_vowels(format) + self.format_size(size)
 
-                    # append key into key_list for merge sort
-                    self.key_list_qh.append(key)
-
+                    # append key into key_arr for merge sort
+                    self.key_arr_qh = np.append(self.key_arr_qh, key)
+            
                     # insert key and collection as field into document
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"spiderName": collection}})
                     n += 1
-        self.sort_sortkey()
-
+        print(self.key_arr_qh)
+    
     def sort_sortkey(self):
-        copy_key_list = list(self.key_list_qh) # make a original copy of the list
-        self.hybrid_quick_sort(self.key_list_qh, 0 ,len(self.key_list_qh)-1)  # sort the sort-key 
+        copy_key_arr = self.key_arr_qh # make a original copy of the arr
+        self.hybrid_quick_sort(self.key_arr_qh, 0 ,len(self.key_arr_qh)-1)  # sort the sort-key 
         print("num\tvor Sortierung\tnach Sortierung")
-        for i, (a, b) in enumerate(zip(copy_key_list, self.key_list_qh)):
+        for i, (a, b) in enumerate(zip(copy_key_arr, self.key_arr_qh)):
             print(str(i) + '\t' +  a+ '\t' + b)
-        p = list(self.create_partition(self.key_list_qh))
-        print(list(self.create_partition(self.key_list_qh)))
-        self.partition_size(p)
-        print(self.sorted_blocks(self.key_list_qh,4))
 
     def hashed_title(self, title):
         # hash the title for comparison purposes
@@ -90,12 +87,12 @@ class FindDuplicate:
     
     # convert MIME type to part of the key by getting it's non vowel alphabet such as application/pdf will be pplpdf
     def non_vowels(self, format):
-        # split application/pdf to list['application','pdf']
-        list = format.split('/')
+        # split application/pdf to arr['application','pdf']
+        arr = format.split('/')
         vowels = ('a','e','i','o','u')
         non_vowels = ""
 
-        for word in list:
+        for word in arr:
             # n acts as a breakpoint. It stops after getting 3 non vowels.
             n = 0
             for alphabet in word.lower():
@@ -112,69 +109,69 @@ class FindDuplicate:
         return str(size)[0:2]
         
     # Hybrid Quick Sort 
-    def insertion_sort(self, list, low, n):    
-        for i in range(low + 1, n + 1):
-            pivot = list[i]
-            while i>low and list[i-1]>pivot:
-                list[i]= list[i-1]
-                i-= 1
-            list[i]= pivot
- 
-    def partition(self, list, low, high):
-        pivot = list[high]
-        i = j = low
-        for i in range(low, high):
-            if list[i]<pivot:
-                list[i], list[j]= list[j], list[i]
-                j+= 1
-        list[j], list[high]= list[high], list[j]
-        return j
-         
-    def hybrid_quick_sort(self, list, low, high):
+    def hybrid_quick_sort(self, arr, low, high):
         while low<high:
-            # when the list has less than 10 elements, then run insertionsort. the threshold is self-defined.
+            # when the arr has less than 10 elements, then run insertionsort. the threshold is self-defined.
             if high-low + 1<10:
-                self.insertion_sort(list, low, high)
+                self.insertion_sort(arr, low, high)
                 break
             else:
-                pivot = self.partition(list, low, high)
+                pivot = self.partition(arr, low, high)
                 if pivot-low<high-pivot: # hybrid sort left side (between low and pivot)
-                    self.hybrid_quick_sort(list, low, pivot-1)
+                    self.hybrid_quick_sort(arr, low, pivot-1)
                     low = pivot + 1
                 else: # hybrid sort right side (between pivot and high)
-                    self.hybrid_quick_sort(list, pivot + 1, high)
+                    self.hybrid_quick_sort(arr, pivot + 1, high)
                     high = pivot-1
 
-    def create_partition(self, list):
+    def insertion_sort(self, arr, low, n):    
+        for i in range(low + 1, n + 1):
+            pivot = arr[i]
+            while i>low and arr[i-1]>pivot:
+                arr[i]= arr[i-1]
+                i-= 1
+            arr[i]= pivot
+ 
+    def partition(self, arr, low, high):
+        pivot = arr[high]
+        i = j = low
+        for i in range(low, high):
+            if arr[i]<pivot:
+                arr[i], arr[j]= arr[j], arr[i]
+                j+= 1
+        arr[j], arr[high]= arr[high], arr[j]
+        return j
+         
+    def create_partition(self, arr):
         start_p = 0
         end_p = 0
         #sort based on first 3 characters of the sort key.
-        for i in range(len(list[:-1])): 
-            if(list[i][0:3] == list[i+1][0:3]) :
+        for i in range(len(arr[:-1])): 
+            if(arr[i][0:3] == arr[i+1][0:3]) :
                 end_p = i + 1
             else:    
                 #print("start: " +str(start_p) +"\tend :" +str(end_p)) 
-                self.first_par_element.append(start_p) # save first element in partition
-                yield list[start_p : end_p +1] 
+                self.first_par_element = np.append(self.first_par_element, start_p) # save first element in partition
+                yield arr[start_p : end_p +1] 
                 start_p = i + 1 
                 end_p = start_p
-        self.first_par_element.append(start_p)
-        yield list[start_p : end_p +1]     
+        self.first_par_element = np.append(self.first_par_element, start_p)
+        yield arr[start_p : end_p +1]     
 
-    def partition_size(self, list):
+    def partition_size(self, arr):
         self.max_partition_size = 0
 
-        for i in list: 
+        for i in arr: 
             if(len(i)>self.max_partition_size):
                 self.max_partition_size = len(i)
 
-    def sorted_blocks(self,sorted_list,o):
-        lcr = [] # list comparison records (elements in the window) 
+    def sorted_blocks(self,sorted_arr,o):
+        lcr = [] # arr comparison records (elements in the window) 
         window_num = o + 1 # num of window in overlapping area
         i = 0
-
+        #sorted_arr = arr(sorted_arr)
         # iterate over all records to search for duplicates
-        while i<len(sorted_list):
+        while i<len(sorted_arr):
             
             # if it is first element of the partition 
             if (i in self.first_par_element and i>0) or (len(lcr) == self.max_partition_size): 
@@ -187,22 +184,44 @@ class FindDuplicate:
                 lcr.pop(0)
                 #print("lcr:" , lcr)
                 window_num += 1
-            
+         
             # compare current record with all records in lcr/window
             for j in range(len(lcr)): 
-                if (sorted_list[i]== lcr[j]) and sorted_list.count(lcr[j])>1:
-                    sorted_list.pop(i)
+                #if (sorted_arr[i]== lcr[j]) and sorted_arr.count(lcr[j])>1:
+                if (sorted_arr[i]== lcr[j]) and sorted_arr.tolist().count(lcr[j])>1:
+                    self.delete_document(sorted_arr[i])
+                    #sorted_arr.pop(i)
+                    sorted_arr = np.delete(sorted_arr, i)
                     i-=1
-                    #print("sorted list after popping 1 record out :\n", sorted_list)               
+                    #print("sorted arr after popping 1 record out :\n", sorted_arr)               
                 else:         
                     continue
             
             if len(lcr) == self.max_partition_size:
                 lcr.pop(0)
 
-            lcr.append(sorted_list[i])
+            lcr.append(sorted_arr[i])
             i += 1 
-        return sorted_list
+        return sorted_arr
+    
+    def delete_document(self, sortKey):
+        # arr every collection 
+        for collection in self.collection: 
+            if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):
+               # s = self.db.collection.find({"sortKey": sortKey})
+                print(collection + sortKey)
+                x = {'sortKey': sortKey}
+                self.db[collection].delete_one(x)
+                # arr every document in collection
+                #for document in self.db[collection].find():
+                 #   x = document['sortKey']
+                
+                    #if document['sortKey'] == sortKey:
+                     #   self.db[collection].delete_one({ "sortKey": sortKey })
 
 a = FindDuplicate()
 a.create_sort_key()
+a.sort_sortkey()
+p = a.create_partition(a.key_arr_qh)
+a.partition_size(p)
+print(a.sorted_blocks(a.key_arr_qh,2))
