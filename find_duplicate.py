@@ -35,7 +35,7 @@ class FindDuplicate:
         self.key_arr_qh = np.array([]) # list of keys
         self.first_par_element = np.array([]) # first partition element
 
-    def create_sort_key(self):
+    def create_sortKey(self):
         # filter off collection name "system.version" and save the rest as self.collection
         self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
         # arr every collection 
@@ -74,7 +74,7 @@ class FindDuplicate:
     
     def sort_sortkey(self):
         copy_key_arr = self.key_arr_qh # make a original copy of the arr
-        self.hybrid_quick_sort(self.key_arr_qh, 0 ,len(self.key_arr_qh)-1)  # sort the sort-key 
+        self.hybrid_quicksort(self.key_arr_qh, 0 ,len(self.key_arr_qh)-1)  # sort the sort-key 
         print("num\tvor Sortierung\tnach Sortierung")
         for i, (a, b) in enumerate(zip(copy_key_arr, self.key_arr_qh)):
             print(str(i) + '\t' +  a+ '\t' + b)
@@ -83,6 +83,8 @@ class FindDuplicate:
         # hash the title for comparison purposes
         encoded_str = title.lower().encode()
         hash_obj_sha224 = hashlib.sha224(encoded_str)
+        print(title)
+        print(hash_obj_sha224.hexdigest()[0:4])
         return hash_obj_sha224.hexdigest()[0:4]
     
     # convert MIME type to part of the key by getting it's non vowel alphabet such as application/pdf will be pplpdf
@@ -109,22 +111,22 @@ class FindDuplicate:
         return str(size)[0:2]
         
     # Hybrid Quick Sort 
-    def hybrid_quick_sort(self, arr, low, high):
+    def hybrid_quicksort(self, arr, low, high):
         while low<high:
             # when the arr has less than 10 elements, then run insertionsort. the threshold is self-defined.
             if high-low + 1<10:
-                self.insertion_sort(arr, low, high)
+                self.insertionsort(arr, low, high)
                 break
             else:
                 pivot = self.partition(arr, low, high)
                 if pivot-low<high-pivot: # hybrid sort left side (between low and pivot)
-                    self.hybrid_quick_sort(arr, low, pivot-1)
+                    self.hybrid_quicksort(arr, low, pivot-1)
                     low = pivot + 1
                 else: # hybrid sort right side (between pivot and high)
-                    self.hybrid_quick_sort(arr, pivot + 1, high)
+                    self.hybrid_quicksort(arr, pivot + 1, high)
                     high = pivot-1
 
-    def insertion_sort(self, arr, low, n):    
+    def insertionsort(self, arr, low, n):    
         for i in range(low + 1, n + 1):
             pivot = arr[i]
             while i>low and arr[i-1]>pivot:
@@ -204,23 +206,15 @@ class FindDuplicate:
             i += 1 
         return sorted_arr
     
-    def delete_document(self, sortKey):
-        # arr every collection 
+    def delete_document(self, sortKey): 
         for collection in self.collection: 
             if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):
-               # s = self.db.collection.find({"sortKey": sortKey})
                 print(collection + sortKey)
-                x = {'sortKey': sortKey}
-                self.db[collection].delete_one(x)
-                # arr every document in collection
-                #for document in self.db[collection].find():
-                 #   x = document['sortKey']
-                
-                    #if document['sortKey'] == sortKey:
-                     #   self.db[collection].delete_one({ "sortKey": sortKey })
+                self.db[collection].delete_one({'sortKey': sortKey})
+   
 
 a = FindDuplicate()
-a.create_sort_key()
+a.create_sortKey()
 a.sort_sortkey()
 p = a.create_partition(a.key_arr_qh)
 a.partition_size(p)
