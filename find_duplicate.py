@@ -32,10 +32,11 @@ class FindDuplicate:
         self.db = self.client[self.mongo_db]
 
         # array for sorting
-        self.key_arr_qh = np.array([]) # list of keys
+        #self.key_arr_qh = np.array([]) # list of keys
         self.first_par_element = np.array([]) # first partition element
 
     def create_sortKey(self):
+        key_arr_qh = np.array([])
         # filter off collection name "system.version" and save the rest as self.collection
         self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
         # arr every collection 
@@ -64,27 +65,26 @@ class FindDuplicate:
                     key = self.hashed_title(document['lom']['general']['title'].lower()) + self.non_vowels(format) + self.format_size(size)
 
                     # append key into key_arr for merge sort
-                    self.key_arr_qh = np.append(self.key_arr_qh, key)
+                    key_arr_qh = np.append(key_arr_qh, key)
             
                     # insert key and collection as field into document
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"spiderName": collection}})
                     n += 1
-        print(self.key_arr_qh)
-    
-    def sort_sortkey(self):
-        copy_key_arr = self.key_arr_qh # make a original copy of the arr
-        self.hybrid_quicksort(self.key_arr_qh, 0 ,len(self.key_arr_qh)-1)  # sort the sort-key 
-        print("num\tvor Sortierung\tnach Sortierung")
-        for i, (a, b) in enumerate(zip(copy_key_arr, self.key_arr_qh)):
-            print(str(i) + '\t' +  a+ '\t' + b)
+        print(key_arr_qh)
+        return key_arr_qh
+
+    # def sort_sortkey(self):
+    #     copy_key_arr = self.key_arr_qh # make a original copy of the arr
+    #     self.hybrid_quicksort(self.key_arr_qh, 0 ,len(self.key_arr_qh)-1)  # sort the sort-key 
+    #     print("num\tvor Sortierung\tnach Sortierung")
+    #     for i, (a, b) in enumerate(zip(copy_key_arr, self.key_arr_qh)):
+    #         print(str(i) + '\t' +  a+ '\t' + b)
 
     def hashed_title(self, title):
         # hash the title for comparison purposes
         encoded_str = title.lower().encode()
         hash_obj_sha224 = hashlib.sha224(encoded_str)
-        print(title)
-        print(hash_obj_sha224.hexdigest()[0:4])
         return hash_obj_sha224.hexdigest()[0:4]
     
     # convert MIME type to part of the key by getting it's non vowel alphabet such as application/pdf will be pplpdf
@@ -147,6 +147,7 @@ class FindDuplicate:
     def create_partition(self, arr):
         start_p = 0
         end_p = 0
+        #first_par_element = np.array([])
         #sort based on first 3 characters of the sort key.
         for i in range(len(arr[:-1])): 
             if(arr[i][0:3] == arr[i+1][0:3]) :
@@ -158,7 +159,7 @@ class FindDuplicate:
                 start_p = i + 1 
                 end_p = start_p
         self.first_par_element = np.append(self.first_par_element, start_p)
-        yield arr[start_p : end_p +1]     
+        yield arr[start_p : end_p +1]  
 
     def partition_size(self, arr):
         self.max_partition_size = 0
@@ -166,8 +167,9 @@ class FindDuplicate:
         for i in arr: 
             if(len(i)>self.max_partition_size):
                 self.max_partition_size = len(i)
+        return self.max_partition_size
 
-    def sorted_blocks(self,sorted_arr,o):
+    def sorted_blocks(self,sorted_arr,o,max_partition_size):
         lcr = [] # arr comparison records (elements in the window) 
         window_num = o + 1 # num of window in overlapping area
         i = 0
@@ -176,7 +178,7 @@ class FindDuplicate:
         while i<len(sorted_arr):
             
             # if it is first element of the partition 
-            if (i in self.first_par_element and i>0) or (len(lcr) == self.max_partition_size): 
+            if (i in self.first_par_element and i>0) or (len(lcr) == max_partition_size): 
                 # remove all records of the previous partition that is not in overlap
                 while len(lcr) > o:
                     lcr.pop(0)   
@@ -207,15 +209,22 @@ class FindDuplicate:
         return sorted_arr
     
     def delete_document(self, sortKey): 
+        count = 0
         for collection in self.collection: 
-            if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):
-                print(collection + sortKey)
-                self.db[collection].delete_one({'sortKey': sortKey})
-   
+            if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):              
+                if (count == 0):
+                    print(count)
+                    print(collection + sortKey)
+                    self.db[collection].delete_one({'sortKey': sortKey})
+                    count +=1
+                else:
+                    break
+
 
 a = FindDuplicate()
-a.create_sortKey()
-a.sort_sortkey()
-p = a.create_partition(a.key_arr_qh)
-a.partition_size(p)
-print(a.sorted_blocks(a.key_arr_qh,2))
+sort_keylist = a.create_sortKey()
+a.hybrid_quicksort(sort_keylist, 0 ,len(sort_keylist)-1)  # sort the sort-key 
+sorted_keylist = sort_keylist
+p = a.create_partition(sorted_keylist)
+max_size = a.partition_size(p)
+print(a.sorted_blocks(sorted_keylist,2 ,max_size))
