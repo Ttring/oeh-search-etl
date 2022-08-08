@@ -126,14 +126,15 @@ class FindDuplicate:
                     self.hybrid_quicksort(arr, pivot + 1, high)
                     high = pivot-1
 
-    def insertionsort(self, arr, low, n):    
-        for i in range(low + 1, n + 1):
+    def insertionsort(self, arr, low, high):    
+        for i in range(low + 1, high + 1):
             pivot = arr[i]
             while i>low and arr[i-1]>pivot:
                 arr[i]= arr[i-1]
                 i-= 1
             arr[i]= pivot
- 
+
+    # returns middle pivot point
     def partition(self, arr, low, high):
         pivot = arr[high]
         i = j = low
@@ -147,7 +148,7 @@ class FindDuplicate:
     def create_partition(self, arr):
         start_p = 0
         end_p = 0
-        #first_par_element = np.array([])
+
         #sort based on first 3 characters of the sort key.
         for i in range(len(arr[:-1])): 
             if(arr[i][0:3] == arr[i+1][0:3]) :
@@ -201,7 +202,7 @@ class FindDuplicate:
                 else:         
                     continue
             
-            if len(lcr) == self.max_partition_size:
+            if len(lcr) == max_partition_size:
                 lcr.pop(0)
 
             lcr.append(sorted_arr[i])
@@ -213,13 +214,11 @@ class FindDuplicate:
         for collection in self.collection: 
             if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):              
                 if (count == 0):
-                    print(count)
                     print(collection + sortKey)
                     self.db[collection].delete_one({'sortKey': sortKey})
                     count +=1
                 else:
                     break
-
 
 a = FindDuplicate()
 sort_keylist = a.create_sortKey()
