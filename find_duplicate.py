@@ -1,6 +1,8 @@
 import hashlib
+from multiprocessing.dummy import Array
 import random
 from re import A
+from reprlib import aRepr
 import time
 from pprint import pprint
 
@@ -31,14 +33,15 @@ class FindDuplicate:
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
 
+        # filter off collection name "system.version" and save the rest as self.collection
+        self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
+
         # array for sorting
-        #self.key_arr_qh = np.array([]) # list of keys
         self.first_par_element = np.array([]) # first partition element
 
     def create_sortKey(self):
         key_arr_qh = np.array([])
-        # filter off collection name "system.version" and save the rest as self.collection
-        self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
+        
         # arr every collection 
         for collection in self.collection: 
             if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):
@@ -47,7 +50,7 @@ class FindDuplicate:
                 # arr every document in collection
                 for document in self.db[collection].find():
                     #pprint(data)
-                    if n  == 5:
+                    if n  == 10:
                         break
                     try: 
                         size = document['lom']['technical']['duration']
@@ -163,14 +166,14 @@ class FindDuplicate:
         yield arr[start_p : end_p +1]  
 
     def partition_size(self, arr):
-        self.max_partition_size = 0
+        max_partition_size = 0
 
         for i in arr: 
-            if(len(i)>self.max_partition_size):
-                self.max_partition_size = len(i)
-        return self.max_partition_size
+            if(len(i)> max_partition_size):
+                max_partition_size = len(i)
+        return max_partition_size
 
-    def sorted_blocks(self,sorted_arr,o,max_partition_size):
+    def sorted_blocks(self,sorted_arr,o,max_partition_size) -> np.ndarray:
         lcr = [] # arr comparison records (elements in the window) 
         window_num = o + 1 # num of window in overlapping area
         i = 0
@@ -214,16 +217,16 @@ class FindDuplicate:
         for collection in self.collection: 
             if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):              
                 if (count == 0):
-                    print(collection + sortKey)
+                    #print(collection + sortKey)
                     self.db[collection].delete_one({'sortKey': sortKey})
                     count +=1
                 else:
                     break
 
 a = FindDuplicate()
-sort_keylist = a.create_sortKey()
-a.hybrid_quicksort(sort_keylist, 0 ,len(sort_keylist)-1)  # sort the sort-key 
-sorted_keylist = sort_keylist
-p = a.create_partition(sorted_keylist)
-max_size = a.partition_size(p)
-print(a.sorted_blocks(sorted_keylist,2 ,max_size))
+# sort_keylist = a.create_sortKey()
+# a.hybrid_quicksort(sort_keylist, 0 ,len(sort_keylist)-1)  # sort the sort-key 
+# sorted_keylist = sort_keylist
+# p = a.create_partition(sorted_keylist)
+# max_size = a.partition_size(p)
+# print(a.sorted_blocks(sorted_keylist, 2 ,max_size))
