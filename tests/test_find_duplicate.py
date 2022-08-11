@@ -1,22 +1,28 @@
+import json
 from turtle import xcor
 import unittest
+from unittest.mock import patch
 import find_duplicate
-from unittest import mock
 import numpy as np
 from mongoengine import connect, disconnect
 import mongomock
-import pymongo 
+import pymongo
+from pymongo import MongoClient
 
 class TestFindDuplicate(unittest.TestCase):
     # raises an exception while the test is running
     def setUp(self):
         self.fd = find_duplicate.FindDuplicate()
         self.arr = ["6", "3", "1", "9" , "22"]
+        self.collection = mongomock.MongoClient().admin.collection
         self.db = connect(db='mongotest', host='mongomock://localhost')
 
     def tearDown(self):
         disconnect()
-
+    
+    def test_create_sortKey(self):
+        self.assertTrue(len(self.fd.create_sortKey()))
+        
     def test_hashed_title(self):
         self.assertEqual(self.fd.hashed_title("zugunglück von meerbusch - wie sicher ist bahnfahren?"), "231f")
 
@@ -33,7 +39,7 @@ class TestFindDuplicate(unittest.TestCase):
         self.assertEqual(arr, sorted_arr)
     
     def test_insertionsort(self):
-        print(self.fd.insertionsort(self.arr, 0, len(self.arr)-1))
+        #print(self.fd.insertionsort(self.arr, 0, len(self.arr)-1))
         pass
         
     def test_partition(self):
@@ -55,8 +61,22 @@ class TestFindDuplicate(unittest.TestCase):
         x = self.fd.sorted_blocks(partitioned_arr, 2, 3)
         self.assertListEqual(x.tolist(), noduplicate_arr)
 
-    def delete_document(self):
-        pass
+    def test_delete_document(self):
+        # find SortKey from first document 
+        first_document = self.fd.db['test_spider'].find_one()['sortKey']
 
+        # test if SortKey exists 
+        x = self.fd.db['test_spider'].find_one({"sortKey": first_document})
+        self.assertTrue(x)
+
+        # delete based on SortKey
+        self.fd.delete_document(first_document)
+        x = self.fd.db['test_spider'].find_one({"sortKey": first_document})
+        self.assertFalse(x)
+
+        # test with false SortKey
+        y = self.fd.db['test_spider'].find_one({"sortKey": "23433434"})
+        self.assertFalse(y)
+ 
 if __name__ == '__main__':
     unittest.main()
