@@ -22,7 +22,7 @@ from converter import settings
 6: delete duplicate data based on sort key
 '''
 
-class FindDuplicate: 
+class FindDuplicate:
 
     def __init__(self):
         # self.enabled = env.get("MODE", default="edu-sharing") == "edu-sharing"
@@ -30,7 +30,7 @@ class FindDuplicate:
         self.mongo_db = settings.MONGO_DATABASE
 
         # access database on MongoDB
-        self.client = pymongo.MongoClient(self.mongo_uri)
+        self.client = pymongo.MongoClient(self.mongo_uri,  serverSelectionTimeoutMS = 2000)
         self.db = self.client[self.mongo_db]
 
         # filter off collection name "system.version" and save the rest as self.collection
@@ -38,20 +38,20 @@ class FindDuplicate:
 
         # array for sorting
         self.first_par_element = np.array([]) # first partition element
-
+    
     def create_sortKey(self):
         key_arr_qh = np.array([])
         
         # arr every collection 
         for collection in self.collection: 
-            if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):
+            if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="merlin_spider"):
                 print("Collection name: " +collection) 
-                n = 0   
+               # n = 0   
                 # arr every document in collection
                 for document in self.db[collection].find():
                     #pprint(data)
-                    if n  == 10:
-                        break
+                 #   if n  == 10:
+                   #     break
                     try: 
                         size = document['lom']['technical']['duration']
                     except KeyError:
@@ -67,22 +67,15 @@ class FindDuplicate:
                     # change title to small capital letters and combine it with it's format type
                     key = self.hashed_title(document['lom']['general']['title'].lower()) + self.non_vowels(format) + self.format_size(size)
 
-                    # append key into key_arr for merge sort
+                    # append key into key_arr for hybrid-quicksort
                     key_arr_qh = np.append(key_arr_qh, key)
             
                     # insert key and collection as field into document
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
                     self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"spiderName": collection}})
-                    n += 1
+                   # n += 1
         print(key_arr_qh)
         return key_arr_qh
-
-    # def sort_sortkey(self):
-    #     copy_key_arr = self.key_arr_qh # make a original copy of the arr
-    #     self.hybrid_quicksort(self.key_arr_qh, 0 ,len(self.key_arr_qh)-1)  # sort the sort-key 
-    #     print("num\tvor Sortierung\tnach Sortierung")
-    #     for i, (a, b) in enumerate(zip(copy_key_arr, self.key_arr_qh)):
-    #         print(str(i) + '\t' +  a+ '\t' + b)
 
     def hashed_title(self, title):
         # hash the title for comparison purposes
@@ -215,18 +208,18 @@ class FindDuplicate:
     def delete_document(self, sortKey): 
         count = 0
         for collection in self.collection: 
-            if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="copy1sodix_spider"):              
+            if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="merlin"):              
                 if (count == 0):
                     #print(collection + sortKey)
                     self.db[collection].delete_one({'sortKey': sortKey})
-                    count +=1
+                    count += 1
                 else:
                     break
 
 a = FindDuplicate()
-# sort_keylist = a.create_sortKey()
-# a.hybrid_quicksort(sort_keylist, 0 ,len(sort_keylist)-1)  # sort the sort-key 
-# sorted_keylist = sort_keylist
-# p = a.create_partition(sorted_keylist)
-# max_size = a.partition_size(p)
-# print(a.sorted_blocks(sorted_keylist, 2 ,max_size))
+sort_keylist = a.create_sortKey()
+a.hybrid_quicksort(sort_keylist, 0 ,len(sort_keylist)-1)  # sort the sort-key 
+sorted_keylist = sort_keylist
+p = a.create_partition(sorted_keylist)
+max_size = a.partition_size(p)
+print(a.sorted_blocks(sorted_keylist, 2 ,max_size))
