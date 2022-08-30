@@ -1,9 +1,9 @@
-
 import unittest
 import find_duplicate
 import numpy as np
 import time
 from pymongo import errors
+import logging
 
 class TestFindDuplicate(unittest.TestCase):
     # raises an exception while the test is running
@@ -14,12 +14,11 @@ class TestFindDuplicate(unittest.TestCase):
     def test_mongoDB_connection(self):
         start = time.time()
         try: 
-            # raise an exception to see if the instance is true
-            client = self.fd.client
+            # get information about the MongoDB server 
             client.server_info()
             #print ("server_info():", client.server_info())
         except:
-            print("Connection Error")
+            logging.info("Connection Error")
             print(time.time() - start)
             client = None
             return client
@@ -34,8 +33,17 @@ class TestFindDuplicate(unittest.TestCase):
         except errors.ServerSelectionTimeoutError as err:
             print ("nfind_one() ERROR:", err)
 
+    def test_get_collection(self):
+        list_collection = self.fd.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
+        self.assertEqual(self.fd.get_collection('all'), list_collection)
+
+        list_collection_2 = ['test_spider', 'sodix_spider']
+        self.assertEqual(self.fd.get_collection('temp'), list_collection_2)
+
+        self.assertEqual(self.fd.get_collection('test'), ['test_spider'])
+
     def test_create_sortKey(self):
-        self.assertTrue(len(self.fd.create_sortKey()))
+        self.assertTrue(len(self.fd.create_sortKey(['test_spider'])))
         
     def test_hashed_title(self):
         self.assertEqual(self.fd.hashed_title("zugunglück von meerbusch - wie sicher ist bahnfahren?"), "231f")
@@ -82,7 +90,7 @@ class TestFindDuplicate(unittest.TestCase):
         # compare if the block is sorted (elimate duplicate in the same block)
         partitioned_arr = np.array(["234efg", "234efg", "234xdf","5defoi", "ab524c", "ab534e", "ab534e"])
         noduplicate_arr = ['234efg', '234xdf', '5defoi', 'ab524c', 'ab534e']
-        x = self.fd.sorted_blocks(partitioned_arr, 2, 3)
+        x = self.fd.sorted_blocks(partitioned_arr, 2, 3, ['test_spider'])
         self.assertListEqual(x.tolist(), noduplicate_arr)
 
     def test_delete_document(self):
@@ -95,7 +103,7 @@ class TestFindDuplicate(unittest.TestCase):
             self.assertTrue(x)
 
             # delete based on SortKey. Return False if it couldnt find that particular document.
-            self.fd.delete_document(first_document)
+            self.fd.delete_document(first_document, ['test_spider'])
             x = self.fd.db['test_spider'].find_one({"sortKey": first_document})
             self.assertFalse(x)
 
@@ -104,7 +112,7 @@ class TestFindDuplicate(unittest.TestCase):
             self.assertFalse(y)
 
         except TypeError:
-            print("test_spider is empty, Test_spider needs to be executed.")
-
+            logging.info("test_spider is empty, Test_spider needs to be executed. run scrapy crawl test_spider")
+    
 if __name__ == '__main__':
     unittest.main()

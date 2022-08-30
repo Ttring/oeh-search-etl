@@ -1,10 +1,10 @@
+from ast import Delete
 import hashlib
 from multiprocessing.dummy import Array
 import random
 from re import A
 from reprlib import aRepr
 import time
-from pprint import pprint
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,48 +33,52 @@ class FindDuplicate:
         self.client = pymongo.MongoClient(self.mongo_uri,  serverSelectionTimeoutMS = 2000)
         self.db = self.client[self.mongo_db]
 
-        # filter off collection name "system.version" and save the rest as self.collection
-        self.collection = self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
-
-        # array for sorting
+         # array for sorting
         self.first_par_element = np.array([]) # first partition element
     
-    def create_sortKey(self):
+    def get_collection(self, define_collection):
+        if (define_collection == "all") : 
+            # filter off collection name "system.version" and save the rest as self.collection
+            return self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
+        elif(define_collection == "temp") : 
+            # list specific collection for testing
+            return ['test_spider', 'sodix_spider']
+        elif(define_collection == "test"):
+            # use only test_spider for testing
+            return ['test_spider']
+
+    def create_sortKey(self, collection):
         key_arr_qh = np.array([])
         
         # arr every collection 
-        for collection in self.collection: 
-            if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="merlin_spider"):
-                print("Collection name: " +collection) 
-               # n = 0   
-                # arr every document in collection
-                for document in self.db[collection].find():
-                    #pprint(data)
-                 #   if n  == 10:
-                   #     break
-                    try: 
-                        size = document['lom']['technical']['duration']
+        for x in collection: 
+            print(x)
+            for document in self.db[x].find():
+                #   if n  == 10:
+                #     break
+                try: 
+                    size = document['lom']['technical']['duration']
+                except KeyError:
+                    try:
+                        size = document['lom']['technical']['size']
                     except KeyError:
-                        try:
-                            size = document['lom']['technical']['size']
-                        except KeyError:
-                            size = "00"
-                    try :
-                        format = document['lom']['technical']['format']
-                    except KeyError:
-                        format = ""
+                        size = "00"
+                try :
+                    format = document['lom']['technical']['format']
+                except KeyError:
+                    format = ""
 
-                    # change title to small capital letters and combine it with it's format type
-                    key = self.hashed_title(document['lom']['general']['title'].lower()) + self.non_vowels(format) + self.format_size(size)
+                # change title to small capital letters and combine it with it's format type
+                key = self.hashed_title(document['lom']['general']['title'].lower()) + self.non_vowels(format) + self.format_size(size)
 
-                    # append key into key_arr for hybrid-quicksort
-                    key_arr_qh = np.append(key_arr_qh, key)
-            
-                    # insert key and collection as field into document
-                    self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
-                    self.db[collection].update_one( {"_id": document["_id"]}, {"$set": {"spiderName": collection}})
-                   # n += 1
-        print(key_arr_qh)
+                # append key into key_arr for hybrid-quicksort
+                key_arr_qh = np.append(key_arr_qh, key)
+        
+                # insert key and collection as field into document
+                self.db[x].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
+                self.db[x].update_one( {"_id": document["_id"]}, {"$set": {"spiderName": x}})
+                # n += 1
+        #print(key_arr_qh)
         return key_arr_qh
 
     def hashed_title(self, title):
@@ -166,7 +170,7 @@ class FindDuplicate:
                 max_partition_size = len(i)
         return max_partition_size
 
-    def sorted_blocks(self,sorted_arr,o,max_partition_size) -> np.ndarray:
+    def sorted_blocks(self,sorted_arr,o,max_partition_size, collection) -> np.ndarray:
         lcr = [] # arr comparison records (elements in the window) 
         window_num = o + 1 # num of window in overlapping area
         i = 0
@@ -190,7 +194,7 @@ class FindDuplicate:
             for j in range(len(lcr)): 
                 #if (sorted_arr[i]== lcr[j]) and sorted_arr.count(lcr[j])>1:
                 if (sorted_arr[i]== lcr[j]) and sorted_arr.tolist().count(lcr[j])>1:
-                    self.delete_document(sorted_arr[i])
+                    self.delete_document(sorted_arr[i], collection)
                     #sorted_arr.pop(i)
                     sorted_arr = np.delete(sorted_arr, i)
                     i-=1
@@ -205,21 +209,21 @@ class FindDuplicate:
             i += 1 
         return sorted_arr
     
-    def delete_document(self, sortKey): 
+    def delete_document(self, sortKey, collection):
         count = 0
-        for collection in self.collection: 
-            if (collection == "sodix_spider"  or  collection =="test_spider" or collection =="merlin"):              
-                if (count == 0):
-                    #print(collection + sortKey)
-                    self.db[collection].delete_one({'sortKey': sortKey})
-                    count += 1
-                else:
-                    break
+        for x in collection:            
+            if (count == 0):
+                #print(x + sortKey)
+                self.db[x].delete_one({'sortKey': sortKey})
+                count += 1
+            else:
+                break
 
 a = FindDuplicate()
-sort_keylist = a.create_sortKey()
-a.hybrid_quicksort(sort_keylist, 0 ,len(sort_keylist)-1)  # sort the sort-key 
-sorted_keylist = sort_keylist
-p = a.create_partition(sorted_keylist)
-max_size = a.partition_size(p)
-print(a.sorted_blocks(sorted_keylist, 2 ,max_size))
+# collection = a.get_collection('temp')
+# sort_keylist = a.create_sortKey(collection)
+# a.hybrid_quicksort(sort_keylist, 0 ,len(sort_keylist)-1)  # sort the sort-key 
+# sorted_keylist = sort_keylist
+# p = a.create_partition(sorted_keylist)
+# max_size = a.partition_size(p)
+# print(a.sorted_blocks(sorted_keylist, 2 ,max_size, collection))
