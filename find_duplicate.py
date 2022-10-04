@@ -1,4 +1,5 @@
 import hashlib
+from itertools import count
 import logging
 import random
 import time
@@ -13,6 +14,7 @@ import pymongo
 from scipy.optimize import curve_fit
 
 from converter import settings
+from collections import Counter
 
 class FindDuplicate:
 
@@ -30,7 +32,7 @@ class FindDuplicate:
         if (define_collection == "all") : 
             return self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
         elif(define_collection == "temp") : 
-            return ['sodix_spider', 'test_spider']
+            return ['sodix_spider', 'merlin_spider']
         elif(define_collection == "test"):
             return ['test_spider']
 
@@ -52,7 +54,10 @@ class FindDuplicate:
                 try :
                     format = document['lom']['technical']['format']
                 except :
-                    format =  document['thumbnail']['mimetype'] 
+                    try:
+                        format =  document['thumbnail']['mimetype'] 
+                    except KeyError:
+                        size = "NONE"
   
                 key = self.hashed_title(document['lom']['general']['title'].lower()) + self.MIME_type(format) + str(size)
                 key_arr_qh = np.append(key_arr_qh, key)
@@ -146,7 +151,6 @@ class FindDuplicate:
         lcr = [] 
         window_num = o + 1 
         i = 0
-        
         while i<len(sorted_arr):
             
             if (i in self.first_par_element and i>0) or (len(lcr) == max_partition_size): 
@@ -160,8 +164,7 @@ class FindDuplicate:
          
             for j in range(len(lcr)): 
                 if (sorted_arr[i]== lcr[j]) and sorted_arr.tolist().count(lcr[j])>1:
-                    self.delete_document(sorted_arr[i], collection)
-                    
+                    self.delete_document(sorted_arr[i], collection)  
                     sorted_arr = np.delete(sorted_arr, i)
                     i-=1             
                 else:         
@@ -169,9 +172,18 @@ class FindDuplicate:
 
             lcr.append(sorted_arr[i])
             i += 1 
-
         return sorted_arr
     
+    def counter(self,sorted_arr, collection):
+        counter = Counter(sorted_arr)
+        for key,value in counter.items():
+            count = value
+            while count != 1 : 
+                self.delete_document(key, collection)
+                count -= 1
+            counter[key] = count
+        return counter
+
     def delete_document(self, sortKey, collection):
         count = 0
         for x in collection:            
