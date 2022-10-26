@@ -27,22 +27,24 @@ class FindDuplicate:
 
         self.first_par_element = np.array([]) # first partition element
         self.deleted_document = 0
+
+        self.list_delete_document = []
     
     def get_collection(self, define_collection):
         if (define_collection == "all") : 
             return self.db.list_collection_names(filter={'type': 'collection', 'name': {'$ne':  'system.version'}})
         elif(define_collection == "temp") : 
-            return ['sodix_spider', 'merlin_spider']
+            return ['sodix_spider', 'test_spider']
         elif(define_collection == "test"):
             return ['test_spider']
 
     def create_sortKey(self, collection):
         key_arr_qh = np.array([])
-        n = 0
+  
         for x in collection: 
             print(x)
             for document in self.db[x].find():
-
+                
                 try: 
                     size = document['lom']['technical']['duration']
                 except KeyError:
@@ -58,12 +60,11 @@ class FindDuplicate:
                         format =  document['thumbnail']['mimetype'] 
                     except KeyError:
                         size = "NONE"
-  
+
                 key = self.hashed_title(document['lom']['general']['title'].lower()) + self.MIME_type(format) + str(size)
                 key_arr_qh = np.append(key_arr_qh, key)
         
                 self.db[x].update_one( {"_id": document["_id"]}, {"$set": {"sortKey": key}})
-                
         return key_arr_qh
 
     def hashed_title(self, title):
@@ -91,6 +92,7 @@ class FindDuplicate:
         return non_vowels[0:4]
         
     def hybrid_quicksort(self, arr, low, high):
+        print("hybrid_quicksort", arr, "low",low,"high",high, arr[high])
         while low<high:
             # when the arr has less than 10 elements, then run insertionsort. the threshold is self-defined.
             if high-low + 1<10:
@@ -105,7 +107,8 @@ class FindDuplicate:
                     self.hybrid_quicksort(arr, pivot + 1, high)
                     high = pivot-1
 
-    def insertionsort(self, arr, low, high):    
+    def insertionsort(self, arr, low, high):  
+        print("insertionsort", arr, "low",low,"high",high)  
         for i in range(low + 1, high + 1):
             pivot = arr[i]
             while i>low and arr[i-1]>pivot:
@@ -115,8 +118,9 @@ class FindDuplicate:
 
     # returns middle pivot point
     def partition(self, arr, low, high):
+        print("partition", arr, "low",low,"high",high)  
         pivot = arr[high]
-        i = j = low
+        j = low
         for i in range(low, high):
             if arr[i]<pivot:
                 arr[i], arr[j]= arr[j], arr[i]
@@ -177,14 +181,14 @@ class FindDuplicate:
     def counter(self,sorted_arr, collection):
         counter = Counter(sorted_arr)
         for key,value in counter.items():
-            count = value
-            while count != 1 : 
+            while value != 1 : 
                 self.delete_document(key, collection)
-                count -= 1
-            counter[key] = count
+                value -= 1
+            counter[key] = value
         return counter
 
     def delete_document(self, sortKey, collection):
+        #self.list_delete_document.append(sortKey)
         count = 0
         for x in collection:            
             if (count == 0):

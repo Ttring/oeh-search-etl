@@ -617,8 +617,7 @@ class MongoDBPipeline(BasicPipeline, PipelineWithPerSpiderMethods):
     database uri : localhost:12017 
     Both are defined in settings
     '''
-    def __init__(self, mongo_uri, mongo_db):
-        # for mongoDB       
+    def __init__(self, mongo_uri, mongo_db):      
         self.mongo_uri = mongo_uri
         self.mongo_db  = mongo_db
         if not self.mongo_uri : sys.exit("URI to mongoDB is wrong")
@@ -631,20 +630,16 @@ class MongoDBPipeline(BasicPipeline, PipelineWithPerSpiderMethods):
         )
     
     def open_spider(self, spider):       
-        # access database on MongoDB
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
 
-        # delete collection in database if the spider has been crawled before, to avoid duplicate for spider crawler
         collection_exists = spider.name in self.db.list_collection_names()
         if collection_exists == True:
             logging.debug("collection exists")
             collection = self.db[spider.name]
             collection.drop()
-            # create database again with spider name.
             self.collection_name = spider.name
-        else :
-        # create new collection if spider has never been crawled before. 
+        else : 
             logging.debug("collection doesn't exists")
             self.collection_name = spider.name
 
@@ -652,7 +647,6 @@ class MongoDBPipeline(BasicPipeline, PipelineWithPerSpiderMethods):
         self.client.close()
 
     def process_item(self, raw_item, spider):
-        # convert "headers" from byte to dict, because MongoDB doesn't accept byte
         item = ItemAdapter(raw_item)
         byte = item['response']["headers"]
         item['response']["headers"] = byte.to_unicode_dict()
